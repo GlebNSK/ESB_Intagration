@@ -51,7 +51,7 @@ class Object1c():
             "Ref": "00000000-0000-0000-0000-000000000000",
             "DeletionMark": False
         }
-        self.nameType = ""
+        self.nameType = "te"
         self.typeObject1C = ""
 
 
