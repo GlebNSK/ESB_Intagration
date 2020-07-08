@@ -103,12 +103,26 @@ class PaymentOrderOut(PaymentOrder):
 
 
 # Получение ссылок из 1С
-def get_link_object_1c(object_1c, params_request):
+def get_link_object_1c(self, object_1c, parameters_request):
     request_1c = ""
     if object_1c == "client":
         template = 'SELECT value FROM z_keyvalue WHERE key=:key'
         parameters = {'key': 'CLIENT_REQUEST'}
         request_1c = session.execute(template, parameters).fetchall()
+    else:
+        request_1c = ""
+    body_request = {"request_1c": request_1c, "parameters_request": parameters_request}
+
+    conn = self.outgoing.plain_http['mak01.outconn'].conn
+    dl_period = 1  # in days
+
+    params = body_request
+    response = conn.get(self.cid, params=params)
+    if response.status_code != 200:
+        return ""
+    else:
+        data_base = response.json()
+        return data_base.link
 
 # Тесты
 opertest = Operation("test_value");
