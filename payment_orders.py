@@ -73,7 +73,11 @@ class PaymentOrder(Document1c):
         Document1c.__init__(self)
         self.value.update({
             "ВалютаДокумента": "701ae1ac-df7b-11e0-82ba-1c6f65d87821",
-            "ВидОперации": operation.operationType
+            "ВидОперации": operation.operationType,
+            "Контрагент": get_link_object_1c(self, "client",
+                                             {"ИНН": operation.payerInn,
+                                              "КПП": operation.payerKpp,
+                                              "Наименование": operation.payerName})
         })
 
     @staticmethod
