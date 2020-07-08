@@ -102,6 +102,14 @@ class PaymentOrderOut(PaymentOrder):
         self.nameType = "ПлатежноеПоручениеВходящее"
 
 
+# Получение ссылок из 1С
+def get_link_object_1c(object_1c, params_request):
+    request_1c = ""
+    if object_1c == "client":
+        template = 'SELECT value FROM z_keyvalue WHERE key=:key'
+        parameters = {'key': 'CLIENT_REQUEST'}
+        request_1c = session.execute(template, parameters).fetchall()
+
 # Тесты
 opertest = Operation("test_value");
 testWrapper = Wrapper1C("ПлатежноеПоручение", opertest)
