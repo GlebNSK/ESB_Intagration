@@ -35,6 +35,22 @@ class Operation:
     def __init__(self, operation_type):
         self.operationType = operation_type
         self.kbk = "kbk_test"
+        self.payerInn = "payerInn"
+        self.payerKpp = "payerKpp"
+        self.payerName = "payerName"
+        self.amount = 123
+        self.recipient = "test",
+        self.recipientInn = "test",
+        self.recipientKpp = "test",
+        self.payerAccount = "test",
+        self.payerCorrAccount = "test",
+        self.payerBank = "test",
+        self.payerBic = "test",
+        self.recipientAccount = "test",
+        self.recipientCorrAccount = "test",
+        self.recipientBank = "test",
+        self.recipientBic = "test",
+        self.id = "123"
 
     @staticmethod
     def get_name_type_payment(self, operation):
@@ -72,12 +88,34 @@ class PaymentOrder(Document1c):
     def __init__(self, operation):
         Document1c.__init__(self)
         self.value.update({
-            "ВалютаДокумента": "701ae1ac-df7b-11e0-82ba-1c6f65d87821",
+            "ВалютаДокумента": get_link_object_1c(self, "currency",
+                                                  {"КодВалюты": 643}),
             "ВидОперации": operation.operationType,
             "Контрагент": get_link_object_1c(self, "client",
                                              {"ИНН": operation.payerInn,
                                               "КПП": operation.payerKpp,
-                                              "Наименование": operation.payerName})
+                                              "Наименование": operation.payerName}),
+            "Организация": get_link_object_1c(self, "company",
+                                              {"Наименование": operation.recipient,
+                                               "ИНН": operation.recipientInn,
+                                               "КПП": operation.recipientKpp}),
+            "Ответственный": "",
+            "ОтражатьВБухгалтерскомУчете": True,
+            "ОтражатьВНалоговомУчете": True,
+            "ОтраженоВОперУчете": True,
+            "Подразделение": "",
+            "Комментарий": operation.id,
+            "СуммаДокумента": operation.amount,
+            "СчетКонтрагента": get_link_object_1c(self, "clientAccount",
+                                                  {"НомерСчета": operation.payerAccount,
+                                                   "КорСчет": operation.payerCorrAccount,
+                                                   "БАНК": operation.payerBank,
+                                                   "БИК": operation.payerBic}),
+            "СчетОрганизации": get_link_object_1c(self, "companyAccount",
+                                                  {"НомерСчета": operation.recipientAccount,
+                                                   "КорСчет": operation.recipientCorrAccount,
+                                                   "БАНК": operation.recipientBank,
+                                                   "БИК": operation.recipientBic}),
         })
 
     @staticmethod
@@ -109,6 +147,12 @@ class PaymentOrderOut(PaymentOrder):
 # Получение ссылок из 1С
 def get_link_object_1c(self, object_1c, parameters_request):
     request_1c = ""
+    it_test = True
+
+    if it_test:
+        body_request = {"request_1c": request_1c, "parameters_request": parameters_request}
+        return body_request
+
     if object_1c == "client":
         template = 'SELECT value FROM z_keyvalue WHERE key=:key'
         parameters = {'key': 'CLIENT_REQUEST'}
@@ -117,7 +161,7 @@ def get_link_object_1c(self, object_1c, parameters_request):
         request_1c = ""
     body_request = {"request_1c": request_1c, "parameters_request": parameters_request}
 
-    conn = self.outgoing.plain_http['mak01.outconn'].conn
+    conn = outgoing.plain_http['mak01.outconn'].conn
     dl_period = 1  # in days
 
     params = body_request
@@ -127,6 +171,7 @@ def get_link_object_1c(self, object_1c, parameters_request):
     else:
         data_base = response.json()
         return data_base.link
+
 
 # Тесты
 opertest = Operation("test_value");
