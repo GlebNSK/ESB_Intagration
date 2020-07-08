@@ -50,7 +50,17 @@ class Operation:
         self.recipientCorrAccount = "test",
         self.recipientBank = "test",
         self.recipientBic = "test",
-        self.id = "123"
+        self.id = "123",
+        self.paymentType = "test",
+        self.uin = "test",
+        self.creatorStatus = "test",
+        self.oktmo = "test",
+        self.taxEvidence = "test",
+        self.taxPeriod = "test",
+        self.taxDocNumber = "test",
+        self.taxDocDate = "test",
+        self.taxType = "test",
+        self.executionOrder = "test"
 
     @staticmethod
     def get_name_type_payment(self, operation):
