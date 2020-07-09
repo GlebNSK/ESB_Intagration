@@ -1,12 +1,13 @@
 import datetime
 
+it_test = True
+
 
 # Обертки сервисов
 class Wrapper1C:
     def __init__(self, name_object, object_to_serial):
 
         value = ""
-        type = ""
         if name_object == "ПлатежноеПоручение":
             name_object_type = Operation.get_name_type_payment(self, object_to_serial)
             if name_object_type == "in":
@@ -70,7 +71,7 @@ class Operation:
             return "out"
 
 
-# Объекты конфигурации 1С
+# Объекты платформы 1С
 class Object1c():
     def __init__(self):
         self.value = {
@@ -129,15 +130,15 @@ class PaymentOrder(Document1c):
         })
 
     @staticmethod
-    def get_name_type_payment(self, document1C):
-        if document1C.nameType == "jcfg:DocumentObject.ПлатежноеПоручениеВходящее":
+    def get_name_type_payment(self, document_1C):
+        if document_1C.nameType == "jcfg:DocumentObject.ПлатежноеПоручениеВходящее":
             return "in"
         else:
             return "out"
 
     @staticmethod
-    def set_value(self, document1c, name_value, value):
-        document1c.value.update({name_value: value})
+    def set_value(self, document_1C, name_value, value):
+        document_1C.value.update({name_value: value})
 
 
 class PaymentOrderIn(PaymentOrder):
@@ -157,7 +158,6 @@ class PaymentOrderOut(PaymentOrder):
 # Получение ссылок из 1С
 def get_link_object_1c(self, object_1c, parameters_request):
     request_1c = ""
-    it_test = True
 
     if it_test:
         body_request = {"request_1c": request_1c, "parameters_request": parameters_request}
