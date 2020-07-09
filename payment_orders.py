@@ -14,7 +14,11 @@ class Wrapper1C:
                 value_object = PaymentOrderIn(object_to_serial)
             elif name_object_type == "out":
                 value_object = PaymentOrderOut(object_to_serial)
+            else:
+                value_object = {"value": ""}
             value = value_object.value
+        else:
+            value_object = ""
         if value != "":
             self.value = {
                 "#type": value_object.typeObject1C + "." + value_object.nameType,
@@ -144,15 +148,20 @@ class PaymentOrder(Document1c):
 class PaymentOrderIn(PaymentOrder):
     def __init__(self, operation):
         PaymentOrder.__init__(self, operation)
-        self.value.update({'КодКБК': operation.kbk})
-        self.nameType = "ПлатежноеПоручениеИсходящее"
+        self.value.update({'ППВ': operation.kbk})
+        self.nameType = "ПлатежноеПоручениеВходящее"
 
 
 class PaymentOrderOut(PaymentOrder):
     def __init__(self, operation):
         PaymentOrder.__init__(self, operation)
-        self.value.update({'ППВ': operation.kbk})
-        self.nameType = "ПлатежноеПоручениеВходящее"
+
+        self.nameType = "ПлатежноеПоручениеИсходящее"
+        parameters_request = {"Номер": operation.recipient,
+                              "Дата": operation.recipientInn}
+        link_1c = get_link_object_1c(self, "PayOut", parameters_request)
+        if link_1c == "":
+            self.value.update({'КодКБК': operation.kbk})
 
 
 # Получение ссылок из 1С
@@ -166,6 +175,10 @@ def get_link_object_1c(self, object_1c, parameters_request):
     if object_1c == "client":
         template = 'SELECT value FROM z_keyvalue WHERE key=:key'
         parameters = {'key': 'CLIENT_REQUEST'}
+        request_1c = session.execute(template, parameters).fetchall()
+    if object_1c == "PayOut":
+        template = 'SELECT value FROM z_keyvalue WHERE key=:key'
+        parameters = {'key': 'PAYOUT_REQUEST'}
         request_1c = session.execute(template, parameters).fetchall()
     else:
         request_1c = ""
@@ -184,7 +197,6 @@ def get_link_object_1c(self, object_1c, parameters_request):
 
 
 # Тесты
-opertest = Operation("test_value");
-testWrapper = Wrapper1C("ПлатежноеПоручение", opertest)
-
+operation_test = Operation("test_value")
+testWrapper = Wrapper1C("ПлатежноеПоручение", operation_test)
 print(testWrapper.value)
